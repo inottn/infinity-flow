@@ -25,9 +25,11 @@ export class InfinityFlow {
 
   private originalChildren: Element[] = [];
   private resizeObserver: ResizeObserver;
+  private originalStyle: string | null = null;
 
   constructor(element: HTMLElement, options: ScrollerOptions = {}) {
     this.container = element;
+    this.originalStyle = this.container.getAttribute("style");
 
     // Default options
     this.options = {
@@ -52,11 +54,11 @@ export class InfinityFlow {
     this.originalChildren.forEach((child) => {
       // Prevent default image dragging behavior
       if (child.tagName === "IMG") {
-        child.addEventListener("dragstart", (e) => e.preventDefault());
+        child.addEventListener("dragstart", this.preventDefault);
       }
       const imgs = child.querySelectorAll("img");
       imgs.forEach((img) =>
-        img.addEventListener("dragstart", (e) => e.preventDefault())
+        img.addEventListener("dragstart", this.preventDefault)
       );
 
       this.track.appendChild(child);
@@ -77,6 +79,10 @@ export class InfinityFlow {
     this.init();
   }
 
+  private preventDefault = (e: Event) => {
+    e.preventDefault();
+  };
+
   private init() {
     this.setup();
     this.attachEvents();
@@ -91,6 +97,7 @@ export class InfinityFlow {
     if (this.isDestroyed) return;
 
     this.track.innerHTML = "";
+    // Original children are kept in memory (detached), we clone them for display
     this.originalChildren.forEach((child) => {
       this.track.appendChild(child.cloneNode(true));
     });
@@ -114,10 +121,12 @@ export class InfinityFlow {
         clone.setAttribute("aria-hidden", "true");
         // Prevent drag on clones too
         if (clone.tagName === "IMG") {
-          clone.addEventListener("dragstart", (e) => e.preventDefault());
+          clone.addEventListener("dragstart", this.preventDefault);
         }
-        const img = clone.querySelector("img");
-        if (img) img.addEventListener("dragstart", (e) => e.preventDefault());
+        const imgs = clone.querySelectorAll("img");
+        imgs.forEach((img) =>
+          img.addEventListener("dragstart", this.preventDefault)
+        );
 
         this.track.appendChild(clone);
       });
@@ -259,5 +268,34 @@ export class InfinityFlow {
     window.removeEventListener("pointermove", this.onPointerMove);
     window.removeEventListener("pointerup", this.onPointerUp);
     window.removeEventListener("pointercancel", this.onPointerUp);
+
+    // Restore DOM to original state
+    if (this.track && this.track.parentNode === this.container) {
+      this.container.removeChild(this.track);
+    }
+
+    // Clear any potential garbage
+    this.container.innerHTML = "";
+
+    // Put original children back
+    this.originalChildren.forEach((child) => {
+      // Remove listeners we added (optional but good practice)
+      if (child.tagName === "IMG") {
+        child.removeEventListener("dragstart", this.preventDefault);
+      }
+      const imgs = child.querySelectorAll("img");
+      imgs.forEach((img) =>
+        img.removeEventListener("dragstart", this.preventDefault)
+      );
+
+      this.container.appendChild(child);
+    });
+
+    // Restore original inline styles
+    if (this.originalStyle) {
+      this.container.setAttribute("style", this.originalStyle);
+    } else {
+      this.container.removeAttribute("style");
+    }
   }
 }
