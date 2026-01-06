@@ -6,4 +6,7 @@ export default defineConfig({
   html: {
     title: "Infinity Flow",
   },
+  output: {
+    assetPrefix: "/infinity-flow/",
+  },
 });
