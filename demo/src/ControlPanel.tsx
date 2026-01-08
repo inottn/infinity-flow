@@ -17,6 +17,41 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onChange,
   onTogglePlay,
 }) => {
+  const renderTogglePlayButton = () => {
+    return (
+      <IconButton
+        className="shadow-lg shadow-black/20"
+        title={isPlaying ? "Pause" : "Play"}
+        variant="circle"
+        onClick={onTogglePlay}
+      >
+        {isPlaying ? (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="translate-x-0.5"
+          >
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        )}
+      </IconButton>
+    );
+  };
+
   return (
     <div
       className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 
@@ -29,37 +64,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     "
     >
       {/* Play/Pause Section */}
-      <div className="flex-shrink-0">
-        <IconButton
-          className="shadow-lg shadow-black/20"
-          title={isPlaying ? "Pause" : "Play"}
-          variant="circle"
-          onClick={onTogglePlay}
-        >
-          {isPlaying ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-              <rect x="14" y="4" width="4" height="16" rx="1"></rect>
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="translate-x-0.5"
-            >
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-          )}
-        </IconButton>
+      <div className="hidden md:block flex-shrink-0">
+        {renderTogglePlayButton()}
       </div>
 
       <div className="h-8 w-px bg-white/10 mx-3 hidden md:block"></div>
@@ -94,8 +100,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       <div className="h-8 w-px bg-white/10 mx-3 hidden md:block"></div>
       <div className="h-px w-full bg-white/10 md:hidden"></div>
 
-      {/* Toggles/Actions Section */}
+      {/* Actions Section */}
       <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
+        <div className="md:hidden">{renderTogglePlayButton()}</div>
+
         {/* Direction Button */}
         <IconButton
           className="flex-1 md:flex-none"
