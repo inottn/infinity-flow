@@ -59,7 +59,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       transition-all duration-300 hover:border-white/20 group/panel
       flex flex-col md:flex-row items-center
       w-[calc(100%-32px)] max-w-[340px] md:w-auto md:max-w-none
-      rounded-[2rem] md:rounded-full
+      rounded-xl md:rounded-full
       p-4 gap-4 md:py-2 md:px-3 md:gap-0
     "
     >
