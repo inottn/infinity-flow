@@ -23,7 +23,7 @@ export class InfinityFlow {
   private velocity: number = 0; // Pixels per frame
   private friction: number = 0.95; // Inertia decay factor
 
-  private originalChildren: Element[] = [];
+  private originalChildren: HTMLElement[] = [];
   private resizeObserver: ResizeObserver;
   private originalStyle: string | null = null;
 
@@ -49,20 +49,14 @@ export class InfinityFlow {
     // Prevent user selection during drag
     this.track.style.userSelect = "none";
 
-    // Move existing children into the track
-    this.originalChildren = Array.from(this.container.children);
-    this.originalChildren.forEach((child) => {
-      // Prevent default image dragging behavior
-      if (child.tagName === "IMG") {
-        child.addEventListener("dragstart", this.preventDefault);
-      }
-      const imgs = child.querySelectorAll("img");
-      imgs.forEach((img) =>
-        img.addEventListener("dragstart", this.preventDefault)
-      );
+    // Save original children
+    // We filter for Elements to avoid text nodes causing layout issues
+    this.originalChildren = Array.from(this.container.children).filter(
+      (node): node is HTMLElement => node.nodeType === document.ELEMENT_NODE,
+    );
 
-      this.track.appendChild(child);
-    });
+    // Initial clear and append track
+    this.container.innerHTML = "";
     this.container.appendChild(this.track);
 
     // Setup styles for container
@@ -73,7 +67,10 @@ export class InfinityFlow {
     this.container.style.cursor = "grab";
 
     this.resizeObserver = new ResizeObserver(() => {
-      this.setup();
+      // Use requestAnimationFrame to debounce and ensure layout is ready
+      requestAnimationFrame(() => {
+        this.setup();
+      });
     });
 
     this.init();
@@ -83,6 +80,23 @@ export class InfinityFlow {
     e.preventDefault();
   };
 
+  // Helper to add a clone with necessary event listeners
+  private appendClone(item: HTMLElement) {
+    const clone = item.cloneNode(true) as HTMLElement;
+
+    // Re-attach drag prevention listeners because cloneNode doesn't copy event listeners
+    if (clone.tagName === "IMG") {
+      clone.addEventListener("dragstart", this.preventDefault);
+    }
+    const imgs = clone.querySelectorAll("img");
+    imgs.forEach((img) =>
+      img.addEventListener("dragstart", this.preventDefault),
+    );
+
+    this.track.appendChild(clone);
+    return clone;
+  }
+
   private init() {
     this.setup();
     this.attachEvents();
@@ -91,46 +105,88 @@ export class InfinityFlow {
   }
 
   /**
-   * Calculates widths and clones elements to fill the screen + buffer
+   * setup:
+   * 1. Clear track.
+   * 2. Append original items to measure "Single Set Width".
+   * 3. Repeat original items until they fill the container (Base Content).
+   * 4. Calculate contentWidth (Loop point).
+   * 5. Append buffer items (copies from start) to cover the container width again.
    */
   private setup() {
     if (this.isDestroyed) return;
 
+    // 1. Reset
     this.track.innerHTML = "";
-    // Original children are kept in memory (detached), we clone them for display
-    this.originalChildren.forEach((child) => {
-      this.track.appendChild(child.cloneNode(true));
-    });
+    // We do NOT reset position here to 0 if we are just resizing,
+    // but if the content width changes significantly it might jump.
+    // For simplicity, we keep position but ensure bounds later.
 
-    const rect = this.track.getBoundingClientRect();
-    const singleSetWidth = rect.width;
+    if (this.originalChildren.length === 0) return;
+
     const gap = this.options.gap;
-
-    // Total width of one "unit"
-    this.contentWidth = singleSetWidth + gap;
-
     const containerWidth = this.container.clientWidth;
 
-    // We need enough copies to cover the width + buffer
-    // Adding extra buffer to safely handle rapid dragging in both directions
-    const setsNeeded = Math.ceil(containerWidth / (singleSetWidth + gap)) + 2;
+    // Helper to append the set of original children and return their total width
+    const appendAndMeasureOriginals = (): number => {
+      return this.originalChildren.reduce((addedWidth, item) => {
+        const clone = this.appendClone(item);
+        // We measure immediately. Since we just appended to DOM, offsetWidth causes a reflow and gives correct value.
+        // If item has no width (e.g. display none), this is 0.
+        return addedWidth + clone.offsetWidth + gap;
+      }, 0);
+    };
 
-    for (let i = 0; i < setsNeeded; i++) {
-      this.originalChildren.forEach((child) => {
-        const clone = child.cloneNode(true) as HTMLElement;
-        clone.setAttribute("aria-hidden", "true");
-        // Prevent drag on clones too
-        if (clone.tagName === "IMG") {
-          clone.addEventListener("dragstart", this.preventDefault);
-        }
-        const imgs = clone.querySelectorAll("img");
-        imgs.forEach((img) =>
-          img.addEventListener("dragstart", this.preventDefault)
-        );
+    // 2. Build the "Base Content" (The loop period)
+    let contentWidth = 0;
 
-        this.track.appendChild(clone);
-      });
+    // Always append at least one set
+    const firstSetWidth = appendAndMeasureOriginals();
+    contentWidth += firstSetWidth;
+
+    // Safety check: If elements have 0 width (e.g. hidden), stop to prevent infinite loop
+    if (firstSetWidth <= 0 && gap <= 0) {
+      return;
     }
+    // If width is 0 but gap > 0, the loop will eventually terminate, so that's fine.
+    // But if totally 0, we break.
+    if (contentWidth === 0) return;
+
+    // Repeat appending original set until it fills the container + small buffer
+    // This defines the "Content Width" - the point where we loop back to 0.
+    // We add a safety limit to preventing freezing if something is wrong (e.g. huge container, tiny items)
+    let safetyCounter = 0;
+    while (contentWidth < containerWidth + 100 && safetyCounter < 1000) {
+      contentWidth += appendAndMeasureOriginals();
+      safetyCounter++;
+    }
+
+    this.contentWidth = contentWidth;
+
+    // 3. Add Buffer for Seamless Looping
+    // We need to append items from the start of the list to the end
+    // so that when we scroll past 'contentWidth', the user sees the start sequence again.
+    // The buffer needs to be at least 'containerWidth' wide.
+
+    // We take a snapshot of the current children (which represents the full Base Content sequence)
+    const currentBaseChildren = Array.from(
+      this.track.children,
+    ) as HTMLElement[];
+
+    let bufferWidth = 0;
+    let i = 0;
+    safetyCounter = 0;
+
+    while (bufferWidth < containerWidth && safetyCounter < 1000) {
+      const itemToClone = currentBaseChildren[i % currentBaseChildren.length];
+      const clone = this.appendClone(itemToClone);
+
+      bufferWidth += clone.offsetWidth + gap;
+      i++;
+      safetyCounter++;
+    }
+
+    // Ensure position is within new bounds (handling resize)
+    this.checkBounds();
   }
 
   private attachEvents() {
@@ -187,6 +243,8 @@ export class InfinityFlow {
   };
 
   private checkBounds() {
+    if (this.contentWidth === 0) return;
+
     // Wrap position to keep it within 0 -> contentWidth range
     if (this.position >= this.contentWidth) {
       this.position -= this.contentWidth;
@@ -285,7 +343,7 @@ export class InfinityFlow {
       }
       const imgs = child.querySelectorAll("img");
       imgs.forEach((img) =>
-        img.removeEventListener("dragstart", this.preventDefault)
+        img.removeEventListener("dragstart", this.preventDefault),
       );
 
       this.container.appendChild(child);
