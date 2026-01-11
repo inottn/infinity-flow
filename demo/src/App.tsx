@@ -1,4 +1,4 @@
-import type { ScrollerOptions } from "infinity-flow";
+import type { InfinityFlowOptions } from "infinity-flow";
 import { useState } from "react";
 import { DEMO_IMAGES } from "./constants";
 import { ControlPanel } from "./ControlPanel";
@@ -6,7 +6,7 @@ import { ImageCard } from "./ImageCard";
 import { Marquee } from "./Marquee";
 
 const App: React.FC = () => {
-  const [options, setOptions] = useState<ScrollerOptions>({
+  const [options, setOptions] = useState<InfinityFlowOptions>({
     direction: "left",
     gap: 32,
     pauseOnHover: true,
@@ -15,9 +15,9 @@ const App: React.FC = () => {
 
   const [isPlaying, setIsPlaying] = useState(true);
 
-  const handleOptionChange = <T extends keyof ScrollerOptions>(
+  const handleOptionChange = <T extends keyof InfinityFlowOptions>(
     key: T,
-    value: ScrollerOptions[T]
+    value: InfinityFlowOptions[T],
   ) => {
     setOptions((prev) => ({ ...prev, [key]: value }));
   };

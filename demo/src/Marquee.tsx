@@ -1,9 +1,9 @@
+import InfinityFlow, { type InfinityFlowOptions } from "infinity-flow";
 import { useEffect, useRef } from "react";
-import { InfinityFlow, type ScrollerOptions } from "infinity-flow";
 
 interface MarqueeProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  options?: ScrollerOptions;
+  options?: InfinityFlowOptions;
 }
 
 export const Marquee: React.FC<MarqueeProps> = ({

@@ -1,4 +1,4 @@
-export interface ScrollerOptions {
+export interface InfinityFlowOptions {
   direction?: "left" | "right";
   gap?: number; // Gap between items in pixels
   pauseOnHover?: boolean;
@@ -8,7 +8,7 @@ export interface ScrollerOptions {
 export class InfinityFlow {
   private container: HTMLElement;
   private track: HTMLElement;
-  private options: Required<ScrollerOptions>;
+  private options: Required<InfinityFlowOptions>;
   private animationFrameId: number | null = null;
   private position: number = 0;
   private contentWidth: number = 0;
@@ -27,7 +27,7 @@ export class InfinityFlow {
   private resizeObserver: ResizeObserver;
   private originalStyle: string | null = null;
 
-  constructor(element: HTMLElement, options: ScrollerOptions = {}) {
+  constructor(element: HTMLElement, options: InfinityFlowOptions = {}) {
     this.container = element;
     this.originalStyle = this.container.getAttribute("style");
 
@@ -303,7 +303,7 @@ export class InfinityFlow {
     }
   }
 
-  public updateOptions(newOptions: Partial<ScrollerOptions>) {
+  public updateOptions(newOptions: Partial<InfinityFlowOptions>) {
     const needSetup =
       newOptions.gap !== undefined && newOptions.gap !== this.options.gap;
 
@@ -357,3 +357,5 @@ export class InfinityFlow {
     }
   }
 }
+
+export default InfinityFlow;

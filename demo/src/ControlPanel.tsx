@@ -1,12 +1,12 @@
-import { ScrollerOptions } from "infinity-flow";
+import { InfinityFlowOptions } from "infinity-flow";
 import { IconButton, Slider } from "./Controls";
 
 interface ControlPanelProps {
   isPlaying: boolean;
-  options: ScrollerOptions;
-  onChange: <T extends keyof ScrollerOptions>(
+  options: InfinityFlowOptions;
+  onChange: <T extends keyof InfinityFlowOptions>(
     key: T,
-    value: ScrollerOptions[T]
+    value: InfinityFlowOptions[T],
   ) => void;
   onTogglePlay: () => void;
 }
@@ -112,7 +112,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           onClick={() =>
             onChange(
               "direction",
-              options.direction === "left" ? "right" : "left"
+              options.direction === "left" ? "right" : "left",
             )
           }
         >
