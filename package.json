@@ -1,6 +1,7 @@
 {
   "name": "infinity-flow",
   "version": "0.1.0",
+  "description": "A high-performance, native JavaScript library for creating seamless infinite horizontal scrolling effects (marquee)",
   "type": "module",
   "exports": {
     ".": {
@@ -8,10 +9,15 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rslib build",
     "build:watch": "rslib build --watch"
   },
+  "author": "inottn",
+  "license": "MIT",
   "devDependencies": {
     "@rslib/core": "^0.19.2",
     "typescript": "^5.9.3"
