@@ -16,6 +16,9 @@
     "build": "rslib build",
     "build:watch": "rslib build --watch"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "author": "inottn",
   "license": "MIT",
   "devDependencies": {
