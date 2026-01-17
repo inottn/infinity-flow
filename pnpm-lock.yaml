@@ -17,7 +17,7 @@ importers:
 
   demo:
     dependencies:
-      infinity-flow:
+      '@inottn/infinity-flow':
         specifier: workspace:^
         version: link:..
       react:

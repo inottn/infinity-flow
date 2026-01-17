@@ -18,15 +18,15 @@
 通过 npm、yarn 或 pnpm 安装：
 
 ```bash
-npm install infinity-flow
+npm install @inottn/infinity-flow
 ```
 
 ```bash
-yarn add infinity-flow
+yarn add @inottn/infinity-flow
 ```
 
 ```bash
-pnpm add infinity-flow
+pnpm add @inottn/infinity-flow
 ```
 
 ## 使用方法
@@ -46,7 +46,7 @@ pnpm add infinity-flow
 ### 2. 初始化
 
 ```typescript
-import InfinityFlow from "infinity-flow";
+import InfinityFlow from "@inottn/infinity-flow";
 
 const container = document.getElementById("my-marquee");
 const flow = new InfinityFlow(container, {
@@ -139,7 +139,7 @@ InfinityFlow 适用于所有支持以下特性的现代浏览器：
 InfinityFlow 使用 TypeScript 编写，内置完整的类型定义。
 
 ```typescript
-import InfinityFlow, { type InfinityFlowOptions } from "infinity-flow";
+import InfinityFlow, { type InfinityFlowOptions } from "@inottn/infinity-flow";
 
 const options: InfinityFlowOptions = {
   speed: 2,

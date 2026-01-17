@@ -1,5 +1,5 @@
 {
-  "name": "infinity-flow",
+  "name": "@inottn/infinity-flow",
   "version": "0.1.0",
   "description": "A high-performance, native JavaScript library for creating seamless infinite horizontal scrolling effects (marquee)",
   "type": "module",

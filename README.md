@@ -18,15 +18,15 @@
 Install via npm, yarn, or pnpm:
 
 ```bash
-npm install infinity-flow
+npm install @inottn/infinity-flow
 ```
 
 ```bash
-yarn add infinity-flow
+yarn add @inottn/infinity-flow
 ```
 
 ```bash
-pnpm add infinity-flow
+pnpm add @inottn/infinity-flow
 ```
 
 ## Usage
@@ -46,7 +46,7 @@ The library expects a container with child elements. It will automatically wrap 
 ### 2. Initialization
 
 ```typescript
-import InfinityFlow from "infinity-flow";
+import InfinityFlow from "@inottn/infinity-flow";
 
 const container = document.getElementById("my-marquee");
 const flow = new InfinityFlow(container, {
@@ -139,7 +139,7 @@ InfinityFlow works on all modern browsers that support:
 InfinityFlow is written in TypeScript and includes type definitions out of the box.
 
 ```typescript
-import InfinityFlow, { type InfinityFlowOptions } from "infinity-flow";
+import InfinityFlow, { type InfinityFlowOptions } from "@inottn/infinity-flow";
 
 const options: InfinityFlowOptions = {
   speed: 2,

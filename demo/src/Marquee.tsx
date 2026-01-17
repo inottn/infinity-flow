@@ -1,4 +1,4 @@
-import InfinityFlow, { type InfinityFlowOptions } from "infinity-flow";
+import InfinityFlow, { type InfinityFlowOptions } from "@inottn/infinity-flow";
 import { useEffect, useRef } from "react";
 
 interface MarqueeProps extends React.HTMLAttributes<HTMLDivElement> {

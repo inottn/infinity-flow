@@ -1,4 +1,4 @@
-import type { InfinityFlowOptions } from "infinity-flow";
+import type { InfinityFlowOptions } from "@inottn/infinity-flow";
 import { useState } from "react";
 import { DEMO_IMAGES } from "./constants";
 import { ControlPanel } from "./ControlPanel";

@@ -1,4 +1,4 @@
-import { InfinityFlowOptions } from "infinity-flow";
+import { InfinityFlowOptions } from "@inottn/infinity-flow";
 import { IconButton, Slider } from "./Controls";
 
 interface ControlPanelProps {
