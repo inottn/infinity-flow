@@ -1,4 +1,6 @@
 {
+  "name": "demo",
+  "private": true,
   "scripts": {
     "dev": "rsbuild dev",
     "build": "rsbuild build"
